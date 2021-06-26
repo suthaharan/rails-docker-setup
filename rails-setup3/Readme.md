@@ -1,4 +1,4 @@
-# Rails 5 with MySQL
+# Rails 6 with MySQL, PHPMyAdmin
 
 * Reference of the build from ...
 Link [hhttps://dev.to/itnext/setting-up-ruby-on-rails-with-docker-and-mysql-3mpc]
@@ -42,6 +42,17 @@ $ docker-compose up
 
 * View the application on the browser URL by visiting web page [http://localhost:3001]
 
+* Some useful docker commands
+```
+$ docker-compose exec app php artisan route:list
+$ sudo docker exec -it laravel-app /bin/sh
+$ sudo docker exec -it laravel-db /bin/sh
+
+sudo docker exec -it app npm cache clean -f
+sudo npm install -g n
+sudo n stable
+
+```
 
 * Stop docker
 ```
