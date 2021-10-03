@@ -1,26 +1,36 @@
-FROM ruby:2.6.5
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
-RUN apt-get install default-libmysqlclient-dev -y
-RUN mkdir /app
-WORKDIR /app 
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
+FROM ruby:2.7.2
 
-# Install nodejs
-RUN apt-get update -qq && apt-get install -y nodejs
+ENV LANG C.UTF-8
+ENV APP_ROOT /app
 
-# Add Yarn repository
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+# install required libraries
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+  apt-get update -qq && \
+  apt-get install -y --no-install-recommends \
+  build-essential \
+  nodejs \
+  yarn && \
+  apt-get clean && \
+  rm --recursive --force /var/lib/apt/lists/*
 
-# Update
-RUN apt-get update -y
+# create working directory
+RUN mkdir $APP_ROOT
+WORKDIR $APP_ROOT
 
-# Install Yarn
-RUN apt-get install yarn -y
+# bundle install
+COPY Gemfile $APP_ROOT/Gemfile
+COPY Gemfile.lock $APP_ROOT/Gemfile.lock
+RUN bundle install --jobs 4 --retry 3
 
-RUN bundle install
-ADD . /app
+# create app in container
+COPY . $APP_ROOT
 
+# script to be executed every time the container starts
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+EXPOSE 3000
 
-EXPOSE  3000
+# Start the main process
+CMD ["rails", "server", "-b", "0.0.0.0"]
