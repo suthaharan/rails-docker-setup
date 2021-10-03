@@ -103,21 +103,24 @@ volumes:
 ```
 
 * .env
-
+```
 MYSQL_ROOT_PASSWORD=password
 TZ=Toronto
-
+```
 
 * Gemfile
+```
 source 'https://rubygems.org'
 gem 'rails', '6.0.3'
-
+```
 
 * Gemfile.lock
+```
 #Leave empty
+```
 
 * entrypoint.sh
-
+```
 #!/bin/bash
 set -e
 
@@ -126,13 +129,14 @@ rm -f /myapp/tmp/pids/server.pid
 
 # Then exec the container's main process (what's set as CMD in the Dockerfile).
 exec "$@"
-
+```
 
 * Create a Rails project
 
 Once you have created the files you need, run the rails new command.
-
+```
 $ docker-compose run --rm web rails new . --force --no-deps --database=mysql --skip-turbolinks --skip-test
+```
 
 * Edit database.yml
 
@@ -163,11 +167,14 @@ production:
 Describe password etc. so that you can access with the information set in docker-compose.yml. host is a db container.
 
 * Build the Docker image and create a DB
+```
 docker-compose build
 docker-compose run web bin/rails db:create
-
+```
 
 * Yay! You’re on Rails!
+```
 docker-compose up -d
+```
 
 Start the container, and when the initial Rails screen is displayed, you're done.
